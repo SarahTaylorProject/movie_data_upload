@@ -22,7 +22,7 @@ def movie_upload_main(search_directory="",
   current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'},
   export_to_check_files = False,
   upload_to_database = True,
-  list_of_country_codes_to_exclude = ['USA', 'CHN'],
+  list_of_country_codes_to_exclude = [],
   list_of_country_codes_to_only_include = []):
   result = False
   try:
