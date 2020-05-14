@@ -1,6 +1,6 @@
 '''
-Sarah testing reads of XML files for Kinomatics: can process movies, theaters, screenings
-Make CHOICES here, and run this file
+Main file for running the movie data upload: can process movies, theaters, screenings
+Make CHOICES here, and run this file!
 '''
 
 from tools_for_movie_database import *
@@ -8,11 +8,10 @@ from tools_for_movie_database import *
 ## MAIN
 
 # Choice 1: change this to your search directory of choice
-#search_directory = "C:/Scratch/movie_test_inputs/1st donwload from Christopher/mapping-contemporary-cinema-flow-raw-data/Mapping-Contemporary-Cinema-Flow/WWM-raw-data/2012/12/"
 search_directory = "C:/Scratch/movie_test_inputs/very_small_test_set/"
 
 # Choice 2: change this to a useful schema name of your choice
-output_schema_name = "testing"
+output_schema_name = "testing_small"
 
 # Choice 3: which types of files to upload (leave this to run all three types)
 current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'}

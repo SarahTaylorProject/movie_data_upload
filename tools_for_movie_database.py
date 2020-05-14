@@ -1,5 +1,4 @@
-# Functions specifically made for Kinomatics movie XML/database project
-# Work in progress, Sarah April 17th 2020
+# Functions specifically for movie XML/database project
 
 import pandas as pd
 import xml.etree.ElementTree as etree
@@ -18,7 +17,6 @@ import csv
 import local_creds
 from tools_for_movie_database_miscellaneous import *
 
-# TESTING THIS FUNCTION 13/5/2020
 def movie_upload_main(search_directory="",
   output_schema_name="",
   current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'},
@@ -250,7 +248,7 @@ def parse_movie_file(full_file_name="C:/scratch/121130I.xml",
   output_divider="; ", suggested_encoding="utf-8", output_directory=""):
   result = None
   '''
-  Rudimentary function to test reading in a Kinomatics MOVIE file to a dataframe
+  Rudimentary function to test reading in MOVIE file to a dataframe
   Should be able to be made more generic, and add more columns
   Current reads cast in as a single string otherwise there will be a separate row for each cast member
   Perhaps that should be a different function, for reading to cast table?
@@ -332,7 +330,7 @@ def parse_theater_file(full_file_name="C:/scratch/121130I.xml",
   result = None
   '''
   Sarah 4/3/20
-  Rudimentary function to test reading in a Kinomatics THEATER file to a dataframe
+  Rudimentary function to test reading in a THEATER file to a dataframe
   '''
   try:
     tree = return_tree_from_input_file_with_enforced_encoding_on_error(full_file_name=full_file_name, 
@@ -388,85 +386,12 @@ def parse_theater_file(full_file_name="C:/scratch/121130I.xml",
     return(result)
 
 
-def parse_screening_file(full_file_name="C:/scratch/121130S.xml", 
-  column_names=["movie_id", "movie_name", "theater_id", "main_show_date", 
-  "show_date_count", "showtime_string", "show_time_count"], 
-  output_divider="; ", suggested_encoding="utf-8", output_directory=""):
-  result = None
-  '''
-  Rudimentary function to test reading in a Kinomatics SCREENING file to a dataframe
-  Note: see the SHORTER version below
-
-  '''
-  try:
-    tree = return_tree_from_input_file_with_enforced_encoding_on_error(full_file_name=full_file_name, 
-      suggested_encoding=suggested_encoding,
-      output_directory=output_directory)   
-    if (tree == None):
-      print("SORRY, COULD NOT READ THIS FILE, WILL SKIP:\n{}\n".format(full_file_name))
-      return(result)
-
-    root = tree.getroot()
-    dataframe = pd.DataFrame(columns=column_names)
-    screening_count = 0
-    for screening in root:
-      screening_count += 1
-      #print("file: {}, screening #: {}".format(full_file_name, screening_count))
-      
-      movie_id = return_text_from_element_xml_find(screening, "movie_id")
-      #print("movie_id: {}".format(movie_id))
-      
-      movie_name = return_text_from_element_xml_find(screening, "movie_name")
-      #print("movie name: {}".format(movie_name))
-      
-      theater_id = return_text_from_element_xml_find(screening, "theater_id")
-      #print("theater_id: {}".format(theater_id))
-      
-      show_date_element = return_element_from_xml_find(screening, "show_date")
-      main_show_date = show_date_element.attrib["date"]
-      #print("main_show_date: {}".format(main_show_date))
-      # Note: this was a tricky decision made 16/04/2020: there are "show dates" and there is the main show date, argh
-
-      show_date_count = 0
-      #show_date_comment_list = []
-      show_time_count = 0
-      show_time_list = []
-
-      show_date_element_list = return_element_list_from_xml_find_all(screening, "show_date")
-      for show_date_element in show_date_element_list:
-        show_date_count += 1
-        current_show_date = show_date_element.attrib["date"]
-        #current_show_date_comment = return_text_from_element_xml_find(show_date_element, "show_comments")
-        #show_date_comment_list.append(current_show_date_comment)
-        current_showtime_string = return_text_from_element_xml_find(show_date_element, "showtimes")
-        current_showtime_string = current_showtime_string.replace(".", "")
-        show_time_list.append(current_showtime_string)
-        if (len(current_showtime_string) > 0):
-          show_time_count += len(current_showtime_string.split(","))
-
-      #show_date_comment_string = output_divider.join(show_date_comment_list)
-      showtimes_string = output_divider.join(show_time_list)
-      dataframe = dataframe.append(pd.Series([movie_id, 
-        movie_name, 
-        theater_id,
-        main_show_date,
-        #show_date_comment_string, 
-        show_date_count, 
-        showtimes_string, 
-        show_time_count], index=column_names), ignore_index=True)
-
-    return(dataframe)
-  except:
-    traceback.print_exc()
-    return(result)
-
-
 def parse_screening_file_shorter(full_file_name="C:/scratch/121130S.xml", 
   column_names=["movie_id", "theater_id", "main_show_date", "show_time_count"], 
   output_divider="; ", suggested_encoding="utf-8", output_directory=""):
   result = None
   '''
-  Rudimentary function to test reading in a Kinomatics SCREENING file to a dataframe
+  Rudimentary function to test reading in a SCREENING file to a dataframe
   SHORTER version made April 27th 2020: not as much information retained
 
   '''

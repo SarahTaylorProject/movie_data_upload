@@ -2,12 +2,11 @@
 
 ## Python code for a very specific task!
 
-Made for uploading the numerous XML files used by the Kinomatics research team
-Extracts data from many XML files within particular folders, to a PostgreSQL database formatted to the interests of the Kinomatics team
+Made for uploading the numerous XML files with movie information. Extracts this data from many XML files within particular folders, to a PostgreSQL database formatted to the interests of our research project.
 
 # Requirements
 
-- Local PostgreSQL server with a blank database and write access
+- Local PostgreSQL server with a blank database and with write access
 - A "local_creds.py" file with the following items:
 
 ```    
@@ -19,7 +18,7 @@ database_name = [your database name]
 - Python packages needed in addition to usual ones:
 sqlalchemy, psycopg2, pandas, xml
 
-# Important
+# Important!
 
 Make the choices about what types of files you want to upload, in the run_movie_data_upload.py file
 Choose the source directory in which the XML files can be found. 
