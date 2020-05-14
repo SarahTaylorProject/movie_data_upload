@@ -13,22 +13,24 @@ search_directory = "C:/Scratch/movie_test_inputs/very_small_test_set/"
 # Choice 2: change this to a useful schema name of your choice
 output_schema_name = "testing_small"
 
-# Choice 3: which types of files to upload (leave this to run all three types)
-current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'}
-
-# Choice 4: choice of whether to upload to DB and/or whether to make test CSV copies
-# only change these if you want to run some tests
-export_to_check_files = False
-upload_to_database = True
-
-# Choice 5: country codes to specifically EXCLUDE in this upload
+# Choice 3: country codes to specifically EXCLUDE in this upload
 # This can be VERY helpful for excluding the large countries and running them later
+# Defaults to excluding USA and China
 # To NOT exclude any country codes, make this an empty list []
 list_of_country_codes_to_exclude = ['USA', 'CHN']
 
-# Choice 6: country codes to ONLY include in this upload
-list_of_country_codes_to_only_include = ['ZAF']
+# Choice 4: country codes to ONLY include in this upload
+# Note: this means, ONLY including these codes, to the exclusion of ALL OTHERS
+# It is most likely that this variable would only be non-blank when catching up on countries previously excluded
+list_of_country_codes_to_only_include = []
 
+# Choice 5: which types of files to upload (leave this to run all three types)
+current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'}
+
+# Choice 6: choice of whether to upload to DB and/or whether to make test CSV copies
+# only change these if you want to run some tests
+export_to_check_files = False
+upload_to_database = True
 
 upload_result = movie_upload_main(search_directory=search_directory,
   output_schema_name=output_schema_name,
