@@ -23,10 +23,11 @@ upload_to_database = True
 
 # Choice 5: country codes to specifically EXCLUDE in this upload
 # This can be VERY helpful for excluding the large countries and running them later
+# To NOT exclude any country codes, make this an empty list []
 list_of_country_codes_to_exclude = ['USA', 'CHN']
 
 # Choice 6: country codes to ONLY include in this upload
-list_of_country_codes_to_only_include = []
+list_of_country_codes_to_only_include = ['ZAF']
 
 
 upload_result = movie_upload_main(search_directory=search_directory,
@@ -34,6 +35,7 @@ upload_result = movie_upload_main(search_directory=search_directory,
   current_search_file_type_dictionary = current_search_file_type_dictionary,
   export_to_check_files = export_to_check_files,
   upload_to_database = upload_to_database,
-  list_of_country_codes_to_exclude = list_of_country_codes_to_exclude)
+  list_of_country_codes_to_exclude = list_of_country_codes_to_exclude,
+  list_of_country_codes_to_only_include = list_of_country_codes_to_only_include)
 
 print(upload_result)
