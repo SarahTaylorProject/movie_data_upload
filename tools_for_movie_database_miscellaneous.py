@@ -1,5 +1,5 @@
-# Generic functions useful for Kinomatics movie XML/database project
-# Work in progress, Sarah April 17th 2020
+# Generic functions useful for movie XML/database project
+# Work in progress
 
 # Many sourced from Sarah's other libraries
 # But they are compiled here on the assumption that it is preferable for the movie script to be self-contained
