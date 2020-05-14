@@ -9,7 +9,7 @@ from tools_for_movie_database import *
 
 # Choice 1: change this to your search directory of choice
 #search_directory = "C:/Scratch/movie_test_inputs/1st donwload from Christopher/mapping-contemporary-cinema-flow-raw-data/Mapping-Contemporary-Cinema-Flow/WWM-raw-data/2012/12/"
-search_directory = "C:/Scratch/movie_test_inputs/small_test_set/"
+search_directory = "C:/Scratch/movie_test_inputs/very_small_test_set/"
 
 # Choice 2: change this to a useful schema name of your choice
 output_schema_name = "testing"
