@@ -115,7 +115,7 @@ def movie_upload_main(search_directory="",
         elif (search_file_type == 'theater' and country_code_included == True):
           current_df = parse_theater_file(full_file_name=full_file_name, output_directory=output_directory)
         elif (country_code_included == False):
-          print("Country code not included in this upload, skipping...")
+          print("COUNTRY CODE NOT INCLUDED, SKIPPING...")
           current_df = None
         else:
           print("File type unknown, skipping...")
