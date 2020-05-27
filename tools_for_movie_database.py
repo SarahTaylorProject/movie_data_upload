@@ -19,6 +19,7 @@ from tools_for_movie_database_miscellaneous import *
 
 def movie_upload_main(search_directory="",
   output_schema_name="",
+  log_file_parent_directory_name=None,
   current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'screening': 'S.XML'},
   export_to_check_files = False,
   upload_to_database = True,
@@ -26,8 +27,14 @@ def movie_upload_main(search_directory="",
   list_of_country_codes_to_only_include = []):
   result = False
   try:
-    output_directory = os.path.dirname(sys.argv[0]) + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
+    if (log_file_parent_directory_name == None):
+      # if this input is left as None, will default to creating a subdirectory for the output log files, where the script is running
+      output_directory = os.path.dirname(sys.argv[0]) + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
+    else:
+      output_directory = log_file_parent_directory_name + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
+    
     if not os.path.exists(output_directory):
+      print("Attempting to create directory for log files: {}".format(output_directory))
       os.makedirs(output_directory)       
 
     # conduct initial search of files, put results in a summary CSV

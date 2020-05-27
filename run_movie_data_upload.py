@@ -10,6 +10,12 @@ from tools_for_movie_database import *
 # Choice 1: change this to your search directory of choice
 search_directory = "C:/Scratch/movie_test_inputs/very_small_test_set/"
 
+# Choice 1b: change parent directory for where to output LOG FILES
+# It will make a subdirectory with the same name as output_schema_name (this is very useful)
+# But you can override which parent directory it will put this in
+# Leave as None to default to creating sub directories where the Python script is running
+log_file_parent_directory_name = "C:/Scratch/movie_log_files/"
+
 # Choice 2: change this to a useful schema name of your choice
 output_schema_name = "testing_small"
 
@@ -32,12 +38,14 @@ current_search_file_type_dictionary = {'theater': 'T.XML', 'movie': 'I.XML', 'sc
 export_to_check_files = False
 upload_to_database = True
 
+
 upload_result = movie_upload_main(search_directory=search_directory,
   output_schema_name=output_schema_name,
   current_search_file_type_dictionary = current_search_file_type_dictionary,
   export_to_check_files = export_to_check_files,
   upload_to_database = upload_to_database,
   list_of_country_codes_to_exclude = list_of_country_codes_to_exclude,
-  list_of_country_codes_to_only_include = list_of_country_codes_to_only_include)
+  list_of_country_codes_to_only_include = list_of_country_codes_to_only_include,
+  log_file_parent_directory_name=log_file_parent_directory_name)
 
 print(upload_result)
