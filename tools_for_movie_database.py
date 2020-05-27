@@ -34,7 +34,7 @@ def movie_upload_main(search_directory="",
       output_directory = log_file_parent_directory_name + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
     
     if not os.path.exists(output_directory):
-      print("Attempting to create directory: ")
+      print("Attempting to create directory for log files: {}".format(output_directory))
       os.makedirs(output_directory)       
 
     # conduct initial search of files, put results in a summary CSV
