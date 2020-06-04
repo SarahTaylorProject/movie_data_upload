@@ -2,21 +2,76 @@
 
 ## Python code for a very specific task!
 
-Made for uploading the numerous XML files with movie information. Extracts this data from many XML files within particular folders, to a PostgreSQL database formatted to the interests of our research project.
+Made for uploading the numerous XML files with movie information. Extracts this data from many XML files within particular folders, to a PostgreSQL database OR to a MySQL database, formatted to the interests of our research project.
 
 # Requirements
 
-- Local PostgreSQL server with a blank database and with write access
+## FOR POSTGRES
+
+The script will assume a postgres database unless told otherwise, but, as noted below, it can also work on MySQL.
+Ideally you should have a blank database on your postgres server with a suitable name (e.g. "movie_test")
+But you can leave database_name blank in your local_creds (see below) and it will work on the default 'postgres' database.
+
+TO RUN WITH POSTGRES, YOU NEED:
+
+- PostgreSQL server with username and password for write access, and, ideally, a blank database
 - A "local_creds.py" file with the following items:
 
+###Compulsory for local_creds.py:
 ```    
 username = [postgres username]
 password = [postgres password]
-database_name = [your database name]
 ```
 
-- Python packages needed in addition to usual ones:
-sqlalchemy, psycopg2, pandas, xml
+###Recommended for local_creds.py
+```
+database_name = [your database name; to just use default postgres database, use '']
+database_type = 'postgres' [Or just leave this line out to default to postgres]
+```
+
+###Optional for local_creds.py, only include if connecting remotely
+```
+host = [your host address; leave out to default to 'localhost']
+port = [your port; leave out to default to postgres default 5432]
+```
+
+###Python packages needed in addition to usual ones:
+sqlalchemy
+psycopg2
+pandas
+xml
+
+
+## FOR MYSQL
+
+The script can also work on MySQL.
+Because "schema" and "database" basically mean the same thing on MySQL, you don't need to create a blank database, and if you do, it will just ignore it anyway.
+
+TO RUN WITH MYSQL, YOU NEED:
+
+- MySQL server with username and password for write access
+- A "local_creds.py" file with the following items:
+
+###Compulsory for local_creds.py:
+```    
+username = [mysql username]
+password = [mysql password]
+database_type = 'mysql'
+```
+
+
+###Optional for local_creds.py, only include if connecting remotely
+```
+host = [your host address; leave out to default to 'localhost']
+port = [your port; leave out to default to postgres default 3306]
+```
+
+###Python packages needed in addition to usual ones:
+sqlalchemy
+mysql-connector-python
+pandas
+xml
+
 
 # Important!
 
