@@ -9,49 +9,144 @@ import xml.etree.ElementTree as etree
 import os
 import traceback
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
+from sqlalchemy.schema import CreateSchema
 import csv
 import shutil
 import codecs
 
+import local_creds
 
-## Some functions copied from tools_for_db
+## functions to assist use with connecting to database (mysql or postgres)
 
-def create_schema(cur, schema_name=None):
-  """
-  This function creates a new schema space if it does not exist already on the database cursor connection (cur)
-  If no schema name is passed in the function will return True but not do anything.
-  If a schema_name is passed in it will check whether the schema exists or not, then either a) create a new schema if it
-  did not already exist, or b) leave the existing schema by the same name.
-  It will only return True if either: a) the schema already exists and does not need to be created, or b) the schema was created successfully.
-  If an error is encountered it returns False, most likely without having also created the schema (although this is not impossible).
-  """
-  result = False
+def return_database_type_from_local_creds():
+  result = None
   try:
-    if (schema_name != None):
-      exists = check_if_schema_exists(cur, schema_name)
-      if not exists:
-        sql_string = "CREATE SCHEMA " + schema_name + ";"
-        print(sql_string)
-        cur.execute(sql_string)
+    database_type = local_creds.database_type
+    return(database_type)
+  except:
+    traceback.print_exc()
+    return(result) 
 
-        commit_result = commit_session(session=cur)
-        if (commit_result == False):
-          print("Note: issuing with committing session, but will return True for function 'create_view'")
+def return_database_name_from_local_creds():
+  result = ''
+  try:
+    database_name = local_creds.database_name
+    return(database_name)
+  except:
+    traceback.print_exc()
+    return(result) 
 
-      else:
-        print("The schema {} already exists, I will not attempt to recreate it.".format(schema_name))
-    result = True
-    return(result)
+def return_host_from_local_creds():
+  result = 'localhost'
+  try:
+    host = local_creds.host
+    return(host)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+
+def return_port_from_local_creds():
+  result = None
+  try:
+    database_port = local_creds.port
+    return(database_port)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+
+def return_postgres_or_mysql_engine_from_local_creds(auto_commit=True):
+  result = None
+  """
+  Note: if database_type is None, will default to trying Postgres
+  """
+  try:
+    database_type = return_database_type_from_local_creds()
+    database_name = return_database_name_from_local_creds()
+    host = return_host_from_local_creds()
+    port = return_port_from_local_creds()
+
+    if (database_type == None):
+      database_type = "postgres"
+
+    if (database_type == "postgres"):
+      if (port == None):
+        port = "5432"
+      if (database_name == ""):
+        database_name = "postgres"
+      current_engine = return_postgres_engine(username=local_creds.username, 
+        password=local_creds.password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+    elif (database_type == "mysql"):
+      if (port == None):
+        port = "3306"
+      current_engine = return_mysql_engine(username=local_creds.username, 
+        password=local_creds.password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+
+    return(current_engine)
   except:
     traceback.print_exc()
     return(result)
 
 
-def return_local_postgres_engine(username=None, password=None, host="localhost", port="5432", database_name="movie_test", auto_commit=True):
+def return_postgres_or_mysql_engine(username=None, 
+  password=None, 
+  host="localhost",
+  port=None,
+  database_name="", 
+  database_type=None,
+  auto_commit=True):
+  result = None
+  """
+  Note: if database_type is None, will default to trying Postgres
+  """
+  try:
+    if (database_type == None):
+      database_type = "postgres"
+
+    if (database_type == "postgres"):
+      if (port == None):
+        port = "5432"
+      if (database_name == ""):
+        database_name = "postgres"
+      current_engine = return_postgres_engine(username=username, 
+        password=password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+    elif (database_type == "mysql"):
+      if (port == None):
+        port = "3306"
+      current_engine = return_mysql_engine(username=username, 
+        password=password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+
+    return(current_engine)
+  except:
+    traceback.print_exc()
+    return(result)
+
+
+def return_mysql_engine(username=None, password=None, host="localhost", port="3306", database_name="", auto_commit=True):
+  """
+  Note: relies on having installed mysql-connector-python
+  """
   result = None
   try:
-    url = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, database_name)
+    url = 'mysql+mysqlconnector://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database_name)
     current_engine = create_engine(url)
     print(current_engine)
     if (auto_commit == True):
@@ -63,17 +158,16 @@ def return_local_postgres_engine(username=None, password=None, host="localhost",
     return(result)
 
 
-def return_local_postgres_session(username=None, password=None, host="localhost", port="5432", database_name="movie_test"):
+def return_postgres_engine(username=None, password=None, host="localhost", port="5432", database_name="", auto_commit=True):
   result = None
   try:
-    current_engine = return_local_postgres_engine(username=username, password=password, host=host, port=port, database_name=database_name)
-    print("engine: ")
+    url = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database_name)
+    current_engine = create_engine(url)
     print(current_engine)
-    if (current_engine != None):      
-      result = return_session(current_engine)
-      print("session: ")
-      print(result)
-    return(result)
+    if (auto_commit == True):
+      print("Setting connection to autocommit")
+      current_engine = current_engine.execution_options(autocommit=True)
+    return(current_engine)
   except:
     traceback.print_exc()
     return(result)
@@ -102,142 +196,55 @@ def push_dataframe_to_table_engine_only(engine, dataframe, schema_name, table_na
     return(result)
 
 
-def return_session(current_engine):
+def check_if_schema_exists_with_engine(engine, schema_name):
   """
-  This function takes an engine that has already been created, and returns a session built from it.
-  If successful, returns a session object.
-  If errors encountered, returns False.
-  """
-  result = False
-  try:
-    Session = sessionmaker(bind=current_engine)
-    current_session = Session()
-    return(current_session)
-  except:
-    traceback.print_exc()
-    return (result)
-
-
-def commit_session(session):
-  """
-  This function attempts to commit a session. There are times when it will be passed a cursor however, and in these
-  cases it will return False, but quietly.
-  It will return True if the session is successfully committed, and False if the session is NOT committed,
-  OR if it was handed a cursor.
-  """
-  result = False
-  try:
-    session.commit()
-    result = True
-    return(result)
-  except:
-    return(result)
-
-
-def determine_connection_object_type(cur):
-  """
-  This function takes in some kind of connection object (ie a cursor, a session, etc), and tries to determine what
-  it is. It does this in a very non-elegant way, by determining its type and searching that type for keywords like
-  Connection and Session. If it cannot identify the type, it returns False.
-  Note that 'ursor' is not a typo - some have a capital C and others a lowercase. This may be useful in determining
-  if a cursor is set to autocommit or not - but if not, we should set the string to lowercase and work with 'cursor' etc.
-  Note: we should add to this function with other types of objects (engine?) as needed.
-  """
-  result = False
-  try:
-    class_str = str(type(cur))
-
-    if 'ursor' in class_str:
-      result = 'cursor'
-    elif 'ession' in class_str:
-      result = 'session'
-    elif 'ngine' in class_str:
-      result = 'engine'
-    elif 'onnection' in class_str:
-      result = 'connection'
-    else:
-      result = False
-    return(result)
-  except:
-    traceback.print_exc()
-    return(result)
-
-
-def return_dialect(session_or_engine):
-  """
-  This function returns the SQL dialect of the given database session or engine
-  Passes the input to return_session_dialect function first, if this throws an error, attempts to pass to return_engine_dialect
-  instead. Note that this means a traceback error message may print, but does not mean that the function is breaking
-  as it will happily continue.
-  Returns the dialect if successfully identified, returns None otherwise.
-  """
-  result = None
-  try:
-    result = return_session_dialect(session=session_or_engine)
-    if (result == None):
-      result = return_engine_dialect(engine=session_or_engine)
-    return(result)
-  except:
-    return(result)
-
-
-def return_session_dialect(session):
-  """
-  This function returns the SQL dialect of the given database session
-  Returns the dialect if successfully identified, returns None otherwise.
-  """
-  result = None
-  try:
-    result = session.bind.dialect.name
-    return(result)
-  except:
-    return(result)
-
-
-def check_if_schema_exists(cur, schema_name, dialect='postgresql'):
-  """
-  Looks in the database accessed via the cursor to see whether the schema is present.
-  This is dialect-dependent, so includes a check of dialect (postgresql, oracle, mssql).
-  Note: the USERNAME for oracle is not a typo, it seems to define schemas as users.
+  Looks in the database accessed via the ENGINE to see whether the schema is present.
+  This is NOT dialect-dependent, it uses sqlalchemy 
   Returns True if the schema exists.
   Returns False if a) the schema is found, or b) the sql returns an error.
   """
   result = False
   try:
-    type_of_cur = determine_connection_object_type(cur)
-    #print(type_of_cur)
-    if type_of_cur not in ['session', 'cursor']:
-      print("Warning: This connection type does not appear to be either a cursor or a session. I will attempt to proceed as for a cursor, but this may return False.")
-      type_of_cur = 'cursor'
+    print("Checking if schema exists: {}".format(schema_name))
+    inspector = inspect(engine)
+    schema_list = inspector.get_schema_names()
+    print("Schema list:")
+    print(schema_list)
+    if (schema_name in schema_list):
+      result = True
+    print(result)
+    return (result)
+  except:
+    traceback.print_exc()
+    return (result)
 
-    if type_of_cur == 'session':
-      dialect = return_dialect(cur)
 
-    #print('dialect : {}'.format(dialect))
-
-    if (dialect == 'postgresql'):
-      sql_qry = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{}';".format(schema_name)
-    elif (dialect == 'mssql'):
-      sql_qry = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{}';".format(schema_name)
-    elif (dialect == 'oracle'):
-      sql_qry = "SELECT USERNAME FROM SYS.ALL_USERS WHERE USERNAME = '{}'".format(schema_name)
-    else:
-      print("Sorry, dialect not currently understood. Returning False.")
+def create_schema_with_engine(engine, schema_name):
+  """
+  Creates a schema via the ENGINE rather than cursor.
+  This is NOT dialect-dependent, it uses sqlalchemy and an engine
+  First checks if the schema_name is None: if so, it skips everything and returns True
+  Then checks if schema exists already: if it does, it won't try to recreate
+  If it does not already exist, it attempts to create it
+  Returns True if the schema exists at the end
+  Returns False if errors encountered
+  """
+  result = False
+  try:
+    if (schema_name == None):
+      print("Skipping schema creation, as schema_name set to {}".format(schema_name))
+      result = True
       return(result)
 
-    if type_of_cur == 'session':
-      sql_result = cur.execute(sql_qry).fetchone()
-    elif type_of_cur == 'cursor':
-      cur.execute(sql_qry)
-      sql_result = cur.fetchone()
-    else:
-      sql_result = None
-
-    if (sql_result == None):
-      result = False
-    else:
+    schema_exists = check_if_schema_exists_with_engine(engine, schema_name)
+    if (schema_exists == True):
+      print("Schema name {} already exists, do not need to create".format(schema_name))
       result = True
-
+    else:
+      print("Attempting to create schema: {}".format(schema_name))
+      engine.execute(CreateSchema(schema_name))
+      schema_exists = check_if_schema_exists_with_engine(engine, schema_name)
+      result = schema_exists
     return (result)
   except:
     traceback.print_exc()
@@ -401,3 +408,5 @@ def copy_file_with_suffix(input_file_name, output_file_suffix="_copy", new_direc
   except:
     traceback.print_exc()
     return(result)
+
+

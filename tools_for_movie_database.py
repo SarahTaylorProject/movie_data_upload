@@ -10,11 +10,10 @@ import ast
 import time
 import datetime
 
-from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 import csv
 
-import local_creds
 from tools_for_movie_database_miscellaneous import *
 
 def movie_upload_main(search_directory="",
@@ -29,9 +28,9 @@ def movie_upload_main(search_directory="",
   try:
     if (log_file_parent_directory_name == None):
       # if this input is left as None, will default to creating a subdirectory for the output log files, where the script is running
-      output_directory = os.path.dirname(sys.argv[0]) + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
+      output_directory = os.path.dirname(sys.argv[0]) + os.path.normpath("/") + "schema_" + str(output_schema_name) + os.path.normpath("/")
     else:
-      output_directory = log_file_parent_directory_name + os.path.normpath("/") + output_schema_name + os.path.normpath("/")
+      output_directory = log_file_parent_directory_name + os.path.normpath("/") + "schema_" + str(output_schema_name) + os.path.normpath("/")
     
     if not os.path.exists(output_directory):
       print("Attempting to create directory for log files: {}".format(output_directory))
@@ -67,24 +66,17 @@ def movie_upload_main(search_directory="",
     log_file_writer.writerow(log_file_header)
 
     if (upload_to_database == True):
-      current_engine = return_local_postgres_engine(username=local_creds.username, password=local_creds.password, database_name=local_creds.database_name)
+      current_engine = return_postgres_or_mysql_engine_from_local_creds()
       print(current_engine)
       if (current_engine == None):
         print("Error with engine, will not be able to run database uploads...")
         upload_to_database = False
         return(result)
       else:
-        print("Database engine ok...")
-        current_session = return_session(current_engine)
-
-      if (upload_to_database == True):
-        schema_result = create_schema(cur=current_session, schema_name=output_schema_name)
-        if (schema_result == None):  
+        schema_result = create_schema_with_engine(engine=current_engine, schema_name=output_schema_name)
+        if (schema_result != True):
           print("Error with schema, will not be able to run database uploads...")
-          upload_to_database = False
           return(result)
-        else:
-          print("Schema creation ok...")
 
     # loop through the results of the file search, trying to parse and upload each file, and logging results
     file_count = 0
