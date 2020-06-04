@@ -17,7 +17,8 @@ search_directory = "C:/Scratch/movie_test_inputs/very_small_test_set/"
 log_file_parent_directory_name = "C:/Scratch/movie_log_files/"
 
 # Choice 2: change this to a useful schema name of your choice
-output_schema_name = "testing_small"
+# set to None to use the DEFAULT schema
+output_schema_name = "test1"
 
 # Choice 3: country codes to specifically EXCLUDE in this upload
 # This can be VERY helpful for excluding the large countries and running them later
