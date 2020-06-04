@@ -18,7 +18,7 @@ log_file_parent_directory_name = "C:/Scratch/movie_log_files/"
 
 # Choice 2: change this to a useful schema name of your choice
 # set to None to use the DEFAULT schema
-output_schema_name = "test1"
+output_schema_name = "test_20200604"
 
 # Choice 3: country codes to specifically EXCLUDE in this upload
 # This can be VERY helpful for excluding the large countries and running them later

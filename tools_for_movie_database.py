@@ -14,7 +14,6 @@ import datetime
 from sqlalchemy import create_engine
 import csv
 
-import local_creds
 from tools_for_movie_database_miscellaneous import *
 
 def movie_upload_main(search_directory="",
@@ -67,13 +66,7 @@ def movie_upload_main(search_directory="",
     log_file_writer.writerow(log_file_header)
 
     if (upload_to_database == True):
-      database_type = return_database_type_from_local_creds()
-      print("Local database type from local_creds: {}".format(database_type))
-      current_engine = return_postgres_or_mysql_engine(username=local_creds.username, 
-          password=local_creds.password, 
-          host=local_creds.host,
-          database_name=local_creds.database_name, 
-          database_type=database_type)
+      current_engine = return_postgres_or_mysql_engine_from_local_creds()
       print(current_engine)
       if (current_engine == None):
         print("Error with engine, will not be able to run database uploads...")
@@ -171,17 +164,6 @@ def movie_upload_main(search_directory="",
   except:
     traceback.print_exc()
     return(result)
-
-
-def return_database_type_from_local_creds():
-  result = None
-  try:
-    database_type = local_creds.database_type
-    return(database_type)
-  except:
-    traceback.print_exc()
-    return(result) 
-
 
 
 def return_search_file_count_dictionary(search_directory="", 

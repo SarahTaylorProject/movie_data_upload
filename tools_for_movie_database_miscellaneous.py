@@ -15,7 +15,88 @@ import csv
 import shutil
 import codecs
 
-## functions to assist use with My SQL
+import local_creds
+
+## functions to assist use with connecting to database (mysql or postgres)
+
+def return_database_type_from_local_creds():
+  result = None
+  try:
+    database_type = local_creds.database_type
+    return(database_type)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+def return_database_name_from_local_creds():
+  result = ''
+  try:
+    database_name = local_creds.database_name
+    return(database_name)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+def return_host_from_local_creds():
+  result = 'localhost'
+  try:
+    host = local_creds.host
+    return(host)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+
+def return_port_from_local_creds():
+  result = None
+  try:
+    database_port = local_creds.port
+    return(database_port)
+  except:
+    traceback.print_exc()
+    return(result) 
+
+
+def return_postgres_or_mysql_engine_from_local_creds(auto_commit=True):
+  result = None
+  """
+  Note: if database_type is None, will default to trying Postgres
+  """
+  try:
+    database_type = return_database_type_from_local_creds()
+    database_name = return_database_name_from_local_creds()
+    host = return_host_from_local_creds()
+    port = return_port_from_local_creds()
+
+    if (database_type == None):
+      database_type = "postgres"
+
+    if (database_type == "postgres"):
+      if (port == None):
+        port = "5432"
+      if (database_name == ""):
+        database_name = "postgres"
+      current_engine = return_postgres_engine(username=local_creds.username, 
+        password=local_creds.password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+    elif (database_type == "mysql"):
+      if (port == None):
+        port = "3306"
+      current_engine = return_mysql_engine(username=local_creds.username, 
+        password=local_creds.password, 
+        host=host,
+        port=port,        
+        database_name=database_name,
+        auto_commit=auto_commit)
+
+    return(current_engine)
+  except:
+    traceback.print_exc()
+    return(result)
+
 
 def return_postgres_or_mysql_engine(username=None, 
   password=None, 
@@ -35,6 +116,8 @@ def return_postgres_or_mysql_engine(username=None,
     if (database_type == "postgres"):
       if (port == None):
         port = "5432"
+      if (database_name == ""):
+        database_name = "postgres"
       current_engine = return_postgres_engine(username=username, 
         password=password, 
         host=host,
@@ -64,7 +147,6 @@ def return_mysql_engine(username=None, password=None, host="localhost", port="33
   result = None
   try:
     url = 'mysql+mysqlconnector://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database_name)
-    print(url)
     current_engine = create_engine(url)
     print(current_engine)
     if (auto_commit == True):
@@ -75,10 +157,11 @@ def return_mysql_engine(username=None, password=None, host="localhost", port="33
     traceback.print_exc()
     return(result)
 
+
 def return_postgres_engine(username=None, password=None, host="localhost", port="5432", database_name="", auto_commit=True):
   result = None
   try:
-    url = 'postgresql://{}:{}@{}:{}/{}'.format(username, password, host, port, database_name)
+    url = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(username, password, host, port, database_name)
     current_engine = create_engine(url)
     print(current_engine)
     if (auto_commit == True):
