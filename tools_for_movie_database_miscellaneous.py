@@ -410,3 +410,55 @@ def copy_file_with_suffix(input_file_name, output_file_suffix="_copy", new_direc
     return(result)
 
 
+
+class file_to_upload:
+   """
+   A class for storing information about files to upload to a database.
+   """
+   def __init__( self, input_file_name, to_table_name=None, to_schema_name='public', input_sheet_name=None, skip_row=None, csv_uploaded_successfully=False, 
+      force_unique_column_names=False, column_name_split_delimiter=None, column_name_part_to_use=None,
+      force_all_to_text=False, temp_folder=None, replace_if_exists=True, from_encoding='utf-8', dtype=None, input_excel_dtype=None, chunksize=10000):
+      self.input_file_name = input_file_name
+      self.to_table_name = to_table_name
+      self.to_schema_name = to_schema_name
+      self.input_sheet_name = input_sheet_name
+      self.skip_row = skip_row
+      self.csv_uploaded_successfully = csv_uploaded_successfully
+      self.table_exists_result = None
+      self.force_unique_column_names = force_unique_column_names
+      self.column_name_split_delimiter = column_name_split_delimiter
+      self.column_name_part_to_use = column_name_part_to_use
+      self.force_all_to_text = force_all_to_text
+      self.file_exists = os.path.isfile(input_file_name)
+      self.file_extension = os.path.splitext(input_file_name)[1]
+      if (temp_folder == None):
+         self.temp_folder = os.path.dirname(input_file_name)
+      else:
+         self.temp_folder = temp_folder
+         if not os.path.exists(temp_folder):
+            os.makedirs(temp_folder)
+      self.replace_if_exists = replace_if_exists
+      self.from_encoding = from_encoding
+      self.dtype = dtype
+      self.input_excel_dtype = input_excel_dtype
+      self.chunksize = chunksize
+
+      if (self.file_extension == ".csv"):
+         self.csv_file_name = input_file_name
+      else:
+         self.csv_file_name = None
+      
+      if (to_table_name == None): 
+         self.to_table_name = os.path.splitext(input_file_name)[0].replace(' ', '_').lower()   
+         self.to_table_name = self.to_table_name[:MAX_TABLE_NAME_LENGTH]
+      else:
+         self.to_table_name = to_table_name[:MAX_TABLE_NAME_LENGTH]
+
+   def print_fancy(self, count=None):
+      if (count != None):
+         print("\nUPLOAD FILE INFO #{}".format(count))
+      else:
+         print("\nUPLOAD FILE INFO")
+      class_dictionary = self.__dict__
+      for attr, value in class_dictionary.items():
+         print("{}: {}".format(attr, value))
