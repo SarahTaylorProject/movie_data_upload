@@ -7,7 +7,7 @@ database_name = "movie_test"
 to_schema_name = "test"
 source_directory_name = "C:/Scratch/"
 csv_file_name = "test.csv"
-to_table_name = "test_table"
+to_table_name = "test_table2"
 if_exists = "replace"
 
 from tools_for_movie_database import *
